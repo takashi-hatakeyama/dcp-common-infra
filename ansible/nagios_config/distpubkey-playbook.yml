@@ -1,0 +1,36 @@
+---
+- hosts: all
+  become: yes
+  become_user: sshuser
+  vars:
+    all_user_keys: |
+      {% set o = [] %}
+      {% for i in play_hosts %}
+      {%   set _ = o.append(hostvars[i].pubkey) %}
+      {% endfor %}
+      {{ o }}
+    all_host_keys: |
+      {% set o = [] %}
+      {% for i in play_hosts %}
+      {%   set v = hostvars[i] %}
+      {%   set h = ','.join([i,v.ansible_fqdn]+v.ansible_all_ipv4_addresses) %}
+      {%   set k = ' '.join([h, 'ssh-rsa', v.ansible_ssh_host_key_rsa_public]) %}
+      {%   set _ = o.append({'name': i, 'key': k}) %}
+      {% endfor %}
+      {{ o }}
+  tasks:
+    - shell: ssh-keygen -q -f ~/.ssh/id_rsa -N ''
+      args:
+        creates: ~/.ssh/id_rsa
+    - shell: cat ~/.ssh/id_rsa.pub
+      register: reg
+    - set_fact:
+        pubkey: "{{reg.stdout}}"
+    - authorized_key:
+        user: "{{ansible_user_id}}"
+        key: "{{item}}"
+      with_items: all_user_keys
+    - known_hosts:
+        name: "{{item.name}}"
+        key: "{{item.key}}"
+      with_items: all_host_keys

@@ -1,0 +1,62 @@
+# Localhost.
+- name: create localhost.cfg
+  become: true
+  notify: restart nagios
+  template: >
+    src=localhost.cfg
+    dest=/etc/nagios/objects/localhost.cfg
+    owner={{nagios_user}}
+    group={{nagios_group}}
+    mode=640
+
+- name: load localhost.cfg
+  become: true
+  notify: restart nagios
+  lineinfile: >
+    dest=/etc/nagios/nagios.cfg
+    line="cfg_file=/etc/nagios/objects/localhost.cfg"
+    regexp="cfg_file\=/etc/nagios/objects/localhost\.cfg"
+
+# node03.
+- name: create node03.cfg
+  become: true
+  notify: restart nagios
+  template: >
+    src=node03.cfg
+    dest=/etc/nagios/servers/node03.cfg
+    owner={{nagios_user}}
+    group={{nagios_group}}
+    mode=640
+
+# jenkins.
+- name: create jenkins.cfg
+  become: true
+  notify: restart nagios
+  template: >
+    src=jenkins.cfg
+    dest=/etc/nagios/servers/jenkins.cfg
+    owner={{nagios_user}}
+    group={{nagios_group}}
+    mode=640
+
+# node01.
+- name: create node01.cfg
+  become: true
+  notify: restart nagios
+  template: >
+    src=node01.cfg
+    dest=/etc/nagios/servers/node01.cfg
+    owner={{nagios_user}}
+    group={{nagios_group}}
+    mode=640
+
+# fluentd.
+- name: create fluentd.cfg
+  become: true
+  notify: restart nagios
+  template: >
+    src=fluentd.cfg
+    dest=/etc/nagios/servers/fluentd.cfg
+    owner={{nagios_user}}
+    group={{nagios_group}}
+    mode=640

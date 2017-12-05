@@ -1,0 +1,12 @@
+---
+# This playbook deploys the whole application stack in this site.
+
+- hosts: nagios
+
+  tasks:
+  - name: delete a file from nagios server
+    file :
+      state: absent
+      path: "/etc/nagios/servers/node03.cfg"
+
+  become: true
